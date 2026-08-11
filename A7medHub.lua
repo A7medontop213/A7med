@@ -1,5 +1,18 @@
 print("A7medHub STARTED")
 
+print("STEP 1")
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+print("STEP 2")
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "A7medHub"
+gui.Parent = player:WaitForChild("PlayerGui")
+
+print("STEP 3")
+
 local punishgoatby97mzu = {
 	Instances = {},
 	ThemeChangedHooks = {},
