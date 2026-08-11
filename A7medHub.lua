@@ -13,6 +13,14 @@ gui.Parent = player:WaitForChild("PlayerGui")
 
 print("STEP 3")
 
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 400, 0, 250)
+frame.Position = UDim2.new(0.5, -200, 0.5, -125)
+frame.BackgroundColor3 = Color3.fromRGB(10, 15, 25)
+frame.Parent = gui
+
+print("STEP 4")
+
 local punishgoatby97mzu = {
 	Instances = {},
 	ThemeChangedHooks = {},
