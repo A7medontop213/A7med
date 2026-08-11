@@ -1,8 +1,10 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local ContentProvider = game:GetService("ContentProvider")
 
-local PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
 
 -- Remove old GUI
 local Old = PlayerGui:FindFirstChild("A7medHub")
@@ -38,7 +40,7 @@ Stroke.Transparency = 0.25
 Stroke.Color = Color3.fromRGB(19, 103, 229)
 Stroke.Parent = Frame
 
---// Animated GIF Frames
+--// GIF Frames
 local GIFFrames = {
     "107268249992959",
     "104444112835205",
@@ -65,16 +67,41 @@ local GIFFrames = {
     "138018420561221"
 }
 
---// Animated Image
+--// GIF Image
 local GIF = Instance.new("ImageLabel")
 GIF.Name = "AnimatedLogo"
 GIF.Size = UDim2.fromOffset(90, 90)
-GIF.Position = UDim2.new(0.5, 0, 0, 12)
+GIF.Position = UDim2.new(0.5, 0, 0, 10)
 GIF.AnchorPoint = Vector2.new(0.5, 0)
 GIF.BackgroundTransparency = 1
+GIF.BorderSizePixel = 0
 GIF.ScaleType = Enum.ScaleType.Fit
+GIF.ImageTransparency = 0
 GIF.Image = "rbxassetid://" .. GIFFrames[1]
 GIF.Parent = Frame
+
+--// Preload images
+task.spawn(function()
+    local Assets = {}
+
+    for _, ID in ipairs(GIFFrames) do
+        local Image = Instance.new("ImageLabel")
+        Image.BackgroundTransparency = 1
+        Image.Size = UDim2.fromOffset(1, 1)
+        Image.Image = "rbxassetid://" .. ID
+        Image.Parent = Gui
+
+        table.insert(Assets, Image)
+    end
+
+    pcall(function()
+        ContentProvider:PreloadAsync(Assets)
+    end)
+
+    for _, Image in ipairs(Assets) do
+        Image:Destroy()
+    end
+end)
 
 --// GIF Animation
 task.spawn(function()
@@ -124,12 +151,12 @@ CloseButton.Position = UDim2.new(1, -12, 0, 12)
 CloseButton.AnchorPoint = Vector2.new(1, 0)
 CloseButton.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
 CloseButton.BorderSizePixel = 0
-CloseButton.Text = "X"
+CloseButton.Text = "×"
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.TextSize = 14
+CloseButton.TextSize = 20
 CloseButton.Font = Enum.Font.GothamBold
 CloseButton.AutoButtonColor = false
-CloseButton.ZIndex = 10
+CloseButton.ZIndex = 20
 CloseButton.Parent = Frame
 
 local CloseCorner = Instance.new("UICorner")
@@ -162,24 +189,9 @@ CloseButton.MouseLeave:Connect(function()
     ):Play()
 end)
 
-CloseButton.MouseButton1Click:Connect(function()
-    TweenService:Create(
-        Frame,
-        TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
-        {
-            Size = UDim2.fromOffset(0, 0)
-        }
-    ):Play()
-
-    task.wait(0.35)
-
-    if Gui then
-        Gui:Destroy()
-    end
-end)
-
---// Button Function
+--// Create Button
 local function CreateButton(Name, Text, Position)
+
     local Button = Instance.new("TextButton")
 
     Button.Name = Name
@@ -205,9 +217,10 @@ local function CreateButton(Name, Text, Position)
     ButtonStroke.Parent = Button
 
     Button.MouseEnter:Connect(function()
+
         TweenService:Create(
             Button,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+            TweenInfo.new(0.2),
             {
                 BackgroundColor3 = Color3.fromRGB(19, 103, 229)
             }
@@ -220,12 +233,14 @@ local function CreateButton(Name, Text, Position)
                 Transparency = 0
             }
         ):Play()
+
     end)
 
     Button.MouseLeave:Connect(function()
+
         TweenService:Create(
             Button,
-            TweenInfo.new(0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+            TweenInfo.new(0.2),
             {
                 BackgroundColor3 = Color3.fromRGB(25, 25, 35)
             }
@@ -238,6 +253,7 @@ local function CreateButton(Name, Text, Position)
                 Transparency = 0.7
             }
         ):Play()
+
     end)
 
     return Button
@@ -268,21 +284,28 @@ Copyright.TextSize = 11
 Copyright.Font = Enum.Font.GothamMedium
 Copyright.Parent = Frame
 
---// Button Actions
+--// Button Events
 TPS.MouseButton1Click:Connect(function()
     warn("TPS SELECTED")
+    -- اربط TPS هنا داخل بيئتك
 end)
 
 Touchline.MouseButton1Click:Connect(function()
     warn("TOUCHLINE SELECTED")
+    -- اربط Touchline هنا داخل بيئتك
 end)
 
 --// Drag System
 local Dragging = false
-local DragStart
-local StartPosition
+local DragStart = nil
+local StartPosition = nil
 
 local function UpdateDrag(Input)
+
+    if not DragStart or not StartPosition then
+        return
+    end
+
     local Delta = Input.Position - DragStart
 
     Frame.Position = UDim2.new(
@@ -293,12 +316,12 @@ local function UpdateDrag(Input)
     )
 end
 
--- السحب من الجزء العلوي للواجهة
 Frame.InputBegan:Connect(function(Input)
+
     if Input.UserInputType == Enum.UserInputType.MouseButton1
         or Input.UserInputType == Enum.UserInputType.Touch then
 
-        -- لو ضغط على زر X لا يبدأ السحب
+        -- منع السحب لو الضغط على X
         if Input.Target == CloseButton then
             return
         end
@@ -308,20 +331,54 @@ Frame.InputBegan:Connect(function(Input)
         StartPosition = Frame.Position
 
         Input.Changed:Connect(function()
+
             if Input.UserInputState == Enum.UserInputState.End then
                 Dragging = false
             end
+
         end)
     end
 end)
 
 UserInputService.InputChanged:Connect(function(Input)
-    if Dragging and (
-        Input.UserInputType == Enum.UserInputType.MouseMovement
-        or Input.UserInputType == Enum.UserInputType.Touch
-    ) then
+
+    if not Dragging then
+        return
+    end
+
+    if Input.UserInputType == Enum.UserInputType.MouseMovement
+        or Input.UserInputType == Enum.UserInputType.Touch then
+
         UpdateDrag(Input)
     end
+end)
+
+--// Close Animation
+CloseButton.MouseButton1Click:Connect(function()
+
+    Dragging = false
+
+    local CloseTween = TweenService:Create(
+        Frame,
+        TweenInfo.new(
+            0.35,
+            Enum.EasingStyle.Quint,
+            Enum.EasingDirection.In
+        ),
+        {
+            Position = UDim2.new(0.5, 0, 1.5, 0)
+        }
+    )
+
+    CloseTween:Play()
+
+    CloseTween.Completed:Connect(function()
+
+        if Gui and Gui.Parent then
+            Gui:Destroy()
+        end
+
+    end)
 end)
 
 --// Opening Animation
