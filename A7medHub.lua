@@ -1,3 +1,5 @@
+print("A7medHub STARTED")
+
 local punishgoatby97mzu = {
 	Instances = {},
 	ThemeChangedHooks = {},
