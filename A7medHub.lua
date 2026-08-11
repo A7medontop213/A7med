@@ -8,54 +8,204 @@ if Old then
     Old:Destroy()
 end
 
+--// GUI
 local Gui = Instance.new("ScreenGui")
 Gui.Name = "A7medHub"
 Gui.ResetOnSpawn = false
+Gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 Gui.Parent = PlayerGui
 
+--// Main Frame
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.fromOffset(400, 260)
+Frame.Name = "MainFrame"
+Frame.Size = UDim2.fromOffset(420, 330)
 Frame.Position = UDim2.new(0.5, 0, 1.5, 0)
 Frame.AnchorPoint = Vector2.new(0.5, 0.5)
 Frame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
 Frame.BorderSizePixel = 0
 Frame.Parent = Gui
 
-Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 15)
+local FrameCorner = Instance.new("UICorner")
+FrameCorner.CornerRadius = UDim.new(0, 16)
+FrameCorner.Parent = Frame
 
+--// Border
+local Stroke = Instance.new("UIStroke")
+Stroke.Thickness = 1.5
+Stroke.Transparency = 0.25
+Stroke.Color = Color3.fromRGB(19, 103, 229)
+Stroke.Parent = Frame
+
+--// Animated GIF Frames
+local GIFFrames = {
+    "107268249992959",
+    "104444112835205",
+    "115157039177204",
+    "111931487689142",
+    "139619104460573",
+    "117772948212179",
+    "123663025657786",
+    "138532394395836",
+    "89671915374868",
+    "97768644671894",
+    "135444330442491",
+    "117135674743180",
+    "130369354331313",
+    "70714410933656",
+    "117791680841696",
+    "101796483414639",
+    "118219530086303",
+    "128892414149593",
+    "135225311464064",
+    "82383377492088",
+    "123769817479313",
+    "111514118037660",
+    "138018420561221"
+}
+
+--// GIF Image
+local GIF = Instance.new("ImageLabel")
+GIF.Name = "AnimatedLogo"
+GIF.Size = UDim2.fromOffset(90, 90)
+GIF.Position = UDim2.new(0.5, 0, 0, 12)
+GIF.AnchorPoint = Vector2.new(0.5, 0)
+GIF.BackgroundTransparency = 1
+GIF.ScaleType = Enum.ScaleType.Fit
+GIF.Image = "rbxassetid://" .. GIFFrames[1]
+GIF.Parent = Frame
+
+--// GIF Animation
+task.spawn(function()
+    local FrameSpeed = 0.07
+
+    while Gui.Parent do
+        for _, ImageID in ipairs(GIFFrames) do
+            if not Gui.Parent then
+                break
+            end
+
+            GIF.Image = "rbxassetid://" .. ImageID
+            task.wait(FrameSpeed)
+        end
+    end
+end)
+
+--// Title
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 50)
+Title.Name = "Title"
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Position = UDim2.fromOffset(0, 102)
 Title.BackgroundTransparency = 1
 Title.Text = "A7med Hub"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 26
+Title.TextSize = 25
 Title.Font = Enum.Font.GothamBold
 Title.Parent = Frame
 
-local TPS = Instance.new("TextButton")
-TPS.Size = UDim2.new(1, -60, 0, 55)
-TPS.Position = UDim2.fromOffset(30, 70)
-TPS.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-TPS.Text = "TPS"
-TPS.TextColor3 = Color3.fromRGB(255, 255, 255)
-TPS.TextSize = 20
-TPS.Font = Enum.Font.GothamBold
-TPS.Parent = Frame
+--// Subtitle
+local Subtitle = Instance.new("TextLabel")
+Subtitle.Name = "Subtitle"
+Subtitle.Size = UDim2.new(1, 0, 0, 20)
+Subtitle.Position = UDim2.fromOffset(0, 137)
+Subtitle.BackgroundTransparency = 1
+Subtitle.Text = "A7med"
+Subtitle.TextColor3 = Color3.fromRGB(130, 130, 140)
+Subtitle.TextSize = 12
+Subtitle.Font = Enum.Font.GothamMedium
+Subtitle.Parent = Frame
 
-Instance.new("UICorner", TPS).CornerRadius = UDim.new(0, 10)
+--// Button Function
+local function CreateButton(Name, Text, Position)
+    local Button = Instance.new("TextButton")
 
-local Touchline = Instance.new("TextButton")
-Touchline.Size = UDim2.new(1, -60, 0, 55)
-Touchline.Position = UDim2.fromOffset(30, 140)
-Touchline.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-Touchline.Text = "Touchline"
-Touchline.TextColor3 = Color3.fromRGB(255, 255, 255)
-Touchline.TextSize = 20
-Touchline.Font = Enum.Font.GothamBold
-Touchline.Parent = Frame
+    Button.Name = Name
+    Button.Size = UDim2.new(1, -60, 0, 48)
+    Button.Position = Position
+    Button.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    Button.BorderSizePixel = 0
+    Button.Text = Text
+    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Button.TextSize = 17
+    Button.Font = Enum.Font.GothamBold
+    Button.AutoButtonColor = false
+    Button.Parent = Frame
 
-Instance.new("UICorner", Touchline).CornerRadius = UDim.new(0, 10)
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 10)
+    Corner.Parent = Button
 
+    local ButtonStroke = Instance.new("UIStroke")
+    ButtonStroke.Thickness = 1
+    ButtonStroke.Transparency = 0.7
+    ButtonStroke.Color = Color3.fromRGB(70, 70, 85)
+    ButtonStroke.Parent = Button
+
+    Button.MouseEnter:Connect(function()
+        TweenService:Create(
+            Button,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+            {
+                BackgroundColor3 = Color3.fromRGB(19, 103, 229)
+            }
+        ):Play()
+
+        TweenService:Create(
+            ButtonStroke,
+            TweenInfo.new(0.2),
+            {
+                Transparency = 0
+            }
+        ):Play()
+    end)
+
+    Button.MouseLeave:Connect(function()
+        TweenService:Create(
+            Button,
+            TweenInfo.new(0.2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+            {
+                BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+            }
+        ):Play()
+
+        TweenService:Create(
+            ButtonStroke,
+            TweenInfo.new(0.2),
+            {
+                Transparency = 0.7
+            }
+        ):Play()
+    end)
+
+    return Button
+end
+
+--// TPS Button
+local TPS = CreateButton(
+    "TPS",
+    "TPS",
+    UDim2.fromOffset(30, 170)
+)
+
+--// Touchline Button
+local Touchline = CreateButton(
+    "Touchline",
+    "Touchline",
+    UDim2.fromOffset(30, 228)
+)
+
+--// Copyright
+local Copyright = Instance.new("TextLabel")
+Copyright.Name = "Copyright"
+Copyright.Size = UDim2.new(1, 0, 0, 20)
+Copyright.Position = UDim2.fromOffset(0, 294)
+Copyright.BackgroundTransparency = 1
+Copyright.Text = "A7med"
+Copyright.TextColor3 = Color3.fromRGB(90, 90, 100)
+Copyright.TextSize = 11
+Copyright.Font = Enum.Font.GothamMedium
+Copyright.Parent = Frame
+
+--// Button Actions
 TPS.MouseButton1Click:Connect(function()
     warn("TPS SELECTED")
 end)
@@ -64,9 +214,14 @@ Touchline.MouseButton1Click:Connect(function()
     warn("TOUCHLINE SELECTED")
 end)
 
+--// Opening Animation
 TweenService:Create(
     Frame,
-    TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+    TweenInfo.new(
+        1,
+        Enum.EasingStyle.Quint,
+        Enum.EasingDirection.Out
+    ),
     {
         Position = UDim2.new(0.5, 0, 0.5, 0)
     }
