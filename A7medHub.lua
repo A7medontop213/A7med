@@ -1277,38 +1277,48 @@ local newY = math.clamp(startSize.Y.Offset + delta.Y, 300, 800)
 			Instance.new("UICorner", Dot).CornerRadius = UDim.new(1, 0)
 			punishgoatby97mzu:ApplyThemeObj(Dot, "BackgroundColor3", "ToggleDot")
  
-			ToggleBtn.MouseButton1Click:Connect(function()
-				State = not State
-				CallbackFunc(State)
-				local palette = punishgoatby97mzu.Themes[punishgoatby97mzu.CurrentTheme]
- 
-				UpdateStrokeVisual(State)
- 
-				if State then
-					TweenService
-						:Create(
-							Dot,
-							TweenInfo.new(0.3, Enum.EasingStyle.Quint),
-							{ Position = UDim2.new(0, 20, 0.5, 0) }
-						)
-						:Play()
-					TweenService
-						:Create(
-							SwitchBg,
-							TweenInfo.new(0.3, Enum.EasingStyle.Quint),
-							{ BackgroundColor3 = palette.Accent }
-						)
-						:Play()
-				else
-					TweenService
-						:Create(Dot, TweenInfo.new(0.3, Enum.EasingStyle.Quint), { Position = UDim2.new(0, 2, 0.5, 0) })
-						:Play()
-					TweenService:Create(
+		ToggleBtn.MouseButton1Click:Connect(function()
+			State = not State
+			CallbackFunc(State)
+			local palette = punishgoatby97mzu.Themes[punishgoatby97mzu.CurrentTheme]
+
+			UpdateStrokeVisual(State)
+
+			if not Dot or not Dot.Parent or not SwitchBg or not SwitchBg.Parent then
+				return
+			end
+
+			if State then
+				TweenService
+					:Create(
+						Dot,
+						TweenInfo.new(0.3, Enum.EasingStyle.Quint),
+						{ Position = UDim2.new(0, 20, 0.5, 0) }
+					)
+					:Play()
+
+				TweenService
+					:Create(
 						SwitchBg,
 						TweenInfo.new(0.3, Enum.EasingStyle.Quint),
-						{ BackgroundColor3 = palette.ToggleBgOff }
-					):Play()
-				end
+						{ BackgroundColor3 = palette.Accent }
+					)
+					:Play()
+			else
+				TweenService
+					:Create(
+						Dot,
+						TweenInfo.new(0.3, Enum.EasingStyle.Quint),
+						{ Position = UDim2.new(0, 2, 0.5, 0) }
+					)
+					:Play()
+
+				TweenService:Create(
+					SwitchBg,
+					TweenInfo.new(0.3, Enum.EasingStyle.Quint),
+					{ BackgroundColor3 = palette.ToggleBgOff }
+				):Play()
+			end
  
 				for _, obj in pairs(punishgoatby97mzu.Instances) do
 					if obj.Inst == SwitchBg then
