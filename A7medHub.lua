@@ -1,8 +1,10 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 
 local PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
 
+-- Remove old GUI
 local Old = PlayerGui:FindFirstChild("A7medHub")
 if Old then
     Old:Destroy()
@@ -63,7 +65,7 @@ local GIFFrames = {
     "138018420561221"
 }
 
---// GIF Image
+--// Animated Image
 local GIF = Instance.new("ImageLabel")
 GIF.Name = "AnimatedLogo"
 GIF.Size = UDim2.fromOffset(90, 90)
@@ -93,8 +95,8 @@ end)
 --// Title
 local Title = Instance.new("TextLabel")
 Title.Name = "Title"
-Title.Size = UDim2.new(1, 0, 0, 40)
-Title.Position = UDim2.fromOffset(0, 102)
+Title.Size = UDim2.new(1, -60, 0, 40)
+Title.Position = UDim2.fromOffset(30, 102)
 Title.BackgroundTransparency = 1
 Title.Text = "A7med Hub"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -113,6 +115,68 @@ Subtitle.TextColor3 = Color3.fromRGB(130, 130, 140)
 Subtitle.TextSize = 12
 Subtitle.Font = Enum.Font.GothamMedium
 Subtitle.Parent = Frame
+
+--// Close Button
+local CloseButton = Instance.new("TextButton")
+CloseButton.Name = "CloseButton"
+CloseButton.Size = UDim2.fromOffset(30, 30)
+CloseButton.Position = UDim2.new(1, -12, 0, 12)
+CloseButton.AnchorPoint = Vector2.new(1, 0)
+CloseButton.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+CloseButton.BorderSizePixel = 0
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 14
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.AutoButtonColor = false
+CloseButton.ZIndex = 10
+CloseButton.Parent = Frame
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 8)
+CloseCorner.Parent = CloseButton
+
+local CloseStroke = Instance.new("UIStroke")
+CloseStroke.Thickness = 1
+CloseStroke.Transparency = 0.5
+CloseStroke.Color = Color3.fromRGB(80, 80, 95)
+CloseStroke.Parent = CloseButton
+
+CloseButton.MouseEnter:Connect(function()
+    TweenService:Create(
+        CloseButton,
+        TweenInfo.new(0.15),
+        {
+            BackgroundColor3 = Color3.fromRGB(200, 45, 45)
+        }
+    ):Play()
+end)
+
+CloseButton.MouseLeave:Connect(function()
+    TweenService:Create(
+        CloseButton,
+        TweenInfo.new(0.15),
+        {
+            BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+        }
+    ):Play()
+end)
+
+CloseButton.MouseButton1Click:Connect(function()
+    TweenService:Create(
+        Frame,
+        TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
+        {
+            Size = UDim2.fromOffset(0, 0)
+        }
+    ):Play()
+
+    task.wait(0.35)
+
+    if Gui then
+        Gui:Destroy()
+    end
+end)
 
 --// Button Function
 local function CreateButton(Name, Text, Position)
@@ -179,14 +243,13 @@ local function CreateButton(Name, Text, Position)
     return Button
 end
 
---// TPS Button
+--// Buttons
 local TPS = CreateButton(
     "TPS",
     "TPS",
     UDim2.fromOffset(30, 170)
 )
 
---// Touchline Button
 local Touchline = CreateButton(
     "Touchline",
     "Touchline",
@@ -212,6 +275,53 @@ end)
 
 Touchline.MouseButton1Click:Connect(function()
     warn("TOUCHLINE SELECTED")
+end)
+
+--// Drag System
+local Dragging = false
+local DragStart
+local StartPosition
+
+local function UpdateDrag(Input)
+    local Delta = Input.Position - DragStart
+
+    Frame.Position = UDim2.new(
+        StartPosition.X.Scale,
+        StartPosition.X.Offset + Delta.X,
+        StartPosition.Y.Scale,
+        StartPosition.Y.Offset + Delta.Y
+    )
+end
+
+-- السحب من الجزء العلوي للواجهة
+Frame.InputBegan:Connect(function(Input)
+    if Input.UserInputType == Enum.UserInputType.MouseButton1
+        or Input.UserInputType == Enum.UserInputType.Touch then
+
+        -- لو ضغط على زر X لا يبدأ السحب
+        if Input.Target == CloseButton then
+            return
+        end
+
+        Dragging = true
+        DragStart = Input.Position
+        StartPosition = Frame.Position
+
+        Input.Changed:Connect(function()
+            if Input.UserInputState == Enum.UserInputState.End then
+                Dragging = false
+            end
+        end)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(Input)
+    if Dragging and (
+        Input.UserInputType == Enum.UserInputType.MouseMovement
+        or Input.UserInputType == Enum.UserInputType.Touch
+    ) then
+        UpdateDrag(Input)
+    end
 end)
 
 --// Opening Animation
