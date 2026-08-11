@@ -188,21 +188,37 @@ local function O(index, data)
         }):Play()
     end)
 
-    s.MouseButton1Click:Connect(function()
-        if data.url then
-            animateOut()
+s.MouseButton1Click:Connect(function()
+    if not data.url then
+        warn("[A7med Hub] No URL found")
+        return
+    end
 
-            local success, result = pcall(function()
-                return loadstring(
-                    game:HttpGet(data.url)
-                )()
-            end)
+    print("[A7med Hub] Loading Touchline...")
+    print("[A7med Hub] URL:", data.url)
 
-            if not success then
-                warn("Script Error:", result)
-            end
+    local success, result = pcall(function()
+        local code = game:HttpGet(data.url)
+
+        print("[A7med Hub] Downloaded:", #code, "characters")
+
+        local func, err = loadstring(code)
+
+        if not func then
+            error("Compile Error: " .. tostring(err))
         end
+
+        print("[A7med Hub] Compile successful")
+        func()
+
+        print("[A7med Hub] Touchline finished")
     end)
+
+    if not success then
+        warn("[A7med Hub] ERROR:")
+        warn(result)
+    end
+end)
 end
 
 local X = Instance.new("ImageButton")
