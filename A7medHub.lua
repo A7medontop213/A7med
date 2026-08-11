@@ -3210,4 +3210,6 @@ function punishgoatby97mzu:SetRTXMode(state)
     end)
 end
 local Window = punishgoatby97mzu:CreateWindow("TPS")
+print("TPS WINDOW CREATED")
+
 return punishgoatby97mzu
