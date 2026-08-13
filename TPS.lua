@@ -172,7 +172,6 @@ local NotifUI = Instance.new("ScreenGui")
 NotifUI.Name = "punishgoatNotifUI"
 NotifUI.ResetOnSpawn = false
 NotifUI.IgnoreGuiInset = true
--- Set the highest DisplayOrder so notification cards never get covered by the game's HUD
 NotifUI.DisplayOrder = 99999
 NotifUI.Parent = LocalPlayer:WaitForChild("PlayerGui")
  
@@ -273,15 +272,13 @@ function punishgoatby97mzu:Notify(Data)
 	end)
 end
  
--- This is the "brain" that stores UI state for as long as the script is running
 local UI_Session = {
-    Pos = UDim2.new(0.5, 0, 0.5, 0), -- Default ke tengah
-    Size = UDim2.new(0, 600, 0, 400), -- Default ukuran
+    Pos = UDim2.new(0.5, 0, 0.5, 0),
+    Size = UDim2.new(0, 600, 0, 400),
 }
  function punishgoatby97mzu:CreateWindow(TitleText)
     local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-    -- Se já existir uma instância antiga, destrói
     local oldUI = PlayerGui:FindFirstChild("punishgoatUI")
     if oldUI then
         oldUI:Destroy()
@@ -330,15 +327,14 @@ local UI_Session = {
             end
             local Viewport = Camera.ViewportSize
  
-local maxWidth = 600 + 40
-local maxHeight = 400 + 40
+            local maxWidth = 600 + 40
+            local maxHeight = 400 + 40
  
             local scaleX = Viewport.X / maxWidth
             local scaleY = Viewport.Y / maxHeight
  
             local finalScale = math.min(scaleX, scaleY, 1)
  
-            -- Clamp the minimum scale to 0.38 so it still fits on short phone screens
             MainScale.Scale = math.clamp(finalScale, 0.38, 1)
         end
  
@@ -405,7 +401,7 @@ local maxHeight = 400 + 40
 			local delta = input.Position - dragStart
 			Main.Position =
 				UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-			currentPos = Main.Position -- 🔥 TIMPA: Simpan posisi terbaru setiap kali UI digeser
+			currentPos = Main.Position
 		end
 	end)
  
@@ -466,12 +462,10 @@ MinimizeBtn.MouseButton1Click:Connect(function()
     isMinTweening = true
     isMinimized = not isMinimized
  
-    -- Toggle ProfileCard visibility (assumes the variable is named ProfileCard)
     if ProfileCard then
         ProfileCard.Visible = not isMinimized 
     end
  
-    -- Use currentSize as the target height when un-minimizing
     local targetHeight = isMinimized and 30 or currentSize.Y.Offset
     
     TweenService:Create(Main, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
@@ -591,7 +585,6 @@ end)
 			TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In),
 			{ Size = UDim2.new(0, 0, 0, 0) }
 		):Play()
-		TweenService:Create(FloatingBtn, TweenInfo.new(0.3), { Size = UDim2.new(0, 0, 0, 0) }):Play()
 		task.wait(0.3)
 		punishgoatUI:Destroy()
 	end)
@@ -830,7 +823,6 @@ local newY = math.clamp(startSize.Y.Offset + delta.Y, 300, 800)
 		Page.BorderSizePixel = 0
 		Page.ScrollBarThickness = 2
 		Page.CanvasSize = UDim2.new(0, 0, 0, 0)
-		-- Use Roblox's built-in AutomaticCanvasSize so scroll height adapts to dropdown content automatically
 		Page.AutomaticCanvasSize = Enum.AutomaticSize.Y
 		punishgoatby97mzu:ApplyThemeObj(Page, "ScrollBarImageColor3", "Stroke")
  
@@ -915,7 +907,6 @@ local newY = math.clamp(startSize.Y.Offset + delta.Y, 300, 800)
 			Instance.new("UIPadding", SectionLabel).PaddingTop = UDim.new(0, 15)
 		end
  
-		-- Thin horizontal separator to break up long lists of components.
 		function Tab:CreateDivider()
 			local DividerHolder = Instance.new("Frame", Page)
 			DividerHolder.Size = UDim2.new(1, 0, 0, 9)
@@ -930,8 +921,6 @@ local newY = math.clamp(startSize.Y.Offset + delta.Y, 300, 800)
 			punishgoatby97mzu:ApplyThemeObj(Line, "BackgroundColor3", "Stroke")
 		end
  
-		-- Same idea as CreateDivider, but accepts an optional centered label
-		-- (e.g. AddLine("Advanced"), or just AddLine() for a plain line).
 		function Tab:AddLine(Text)
 			local LineHolder = Instance.new("Frame", Page)
 			LineHolder.Size = UDim2.new(1, 0, 0, 9)
@@ -975,9 +964,6 @@ local newY = math.clamp(startSize.Y.Offset + delta.Y, 300, 800)
 			end
 		end
  
-		-- Live search box. Calls Callback(query) on every keystroke; the caller decides
-		-- what to filter (component list, dropdown options, etc). Returns a handle with
-		-- :Set(text) so the search text can be cleared/updated from outside too.
 		function Tab:CreateSearchBar(Placeholder, Callback)
 			local CallbackFunc = Callback or function() end
  
@@ -998,7 +984,7 @@ local newY = math.clamp(startSize.Y.Offset + delta.Y, 300, 800)
 			Icon.AnchorPoint = Vector2.new(0, 0.5)
 			Icon.Position = UDim2.new(0, 12, 0.5, 0)
 			Icon.BackgroundTransparency = 1
-			Icon.Image = "rbxassetid://10709791245" -- magnifying glass icon
+			Icon.Image = "rbxassetid://10709791245"
 			punishgoatby97mzu:ApplyThemeObj(Icon, "ImageColor3", "TextInactive")
  
 			local Input = Instance.new("TextBox", SearchContainer)
@@ -1039,8 +1025,6 @@ local newY = math.clamp(startSize.Y.Offset + delta.Y, 300, 800)
 				}):Play()
 			end)
  
-			-- [FIX] React on every keystroke (GetPropertyChangedSignal), not just FocusLost,
-			-- so filtering feels instant instead of only firing once the box loses focus.
 			Input:GetPropertyChangedSignal("Text"):Connect(function()
 				ClearBtn.Visible = Input.Text ~= ""
 				CallbackFunc(Input.Text)
@@ -1319,7 +1303,6 @@ local newY = math.clamp(startSize.Y.Offset + delta.Y, 300, 800)
 			local HasDesc = type(Description) == "string" and Description ~= ""
  
 			local ToggleBtn = Instance.new("TextButton", Page)
-			ToggleBtn.Active = false
 			ToggleBtn.Size = UDim2.new(1, 0, 0, HasDesc and 52 or 36)
 			ToggleBtn.AutoButtonColor = false
 			ToggleBtn.Text = ""
@@ -1456,7 +1439,6 @@ local newY = math.clamp(startSize.Y.Offset + delta.Y, 300, 800)
 			local HasDesc = type(Description) == "string" and Description ~= ""
  
 			local ButtonContainer = Instance.new("TextButton", Page)
-			ButtonContainer.Active = false -- 🔥 TAMBAHKAN BARIS INI
 			ButtonContainer.Size = UDim2.new(1, 0, 0, HasDesc and 52 or 36)
 			ButtonContainer.BackgroundTransparency = 0.55
 			ButtonContainer.AutoButtonColor = false
@@ -1614,7 +1596,6 @@ local newY = math.clamp(startSize.Y.Offset + delta.Y, 300, 800)
 			local Value = math.clamp(Default or Min, Min, Max)
  
 			local SliderContainer = Instance.new("TextButton", Page)
-			SliderContainer.Active = false
 			SliderContainer.Size = UDim2.new(1, 0, 0, 42)
 			SliderContainer.BackgroundTransparency = 0.55
 			SliderContainer.AutoButtonColor = false
@@ -1855,7 +1836,6 @@ end
 			local HasDesc = type(Description) == "string" and Description ~= ""
  
 			local InputContainer = Instance.new("TextButton", Page)
-			InputContainer.Active = false
 			InputContainer.Size = UDim2.new(1, 0, 0, HasDesc and 52 or 36)
 			InputContainer.BackgroundTransparency = 0.55
 			InputContainer.AutoButtonColor = false
@@ -1934,11 +1914,9 @@ end
 					:Play()
 				CallbackFunc(TextBox.Text)
 			end)
-			-- [FIX FOCUSLOST BUG] Save instantly so the value registers even before pressing Enter!
 			TextBox:GetPropertyChangedSignal("Text"):Connect(function()
 				CallbackFunc(TextBox.Text)
 			end)
-			-- Detect text changes instantly (real-time) on paste, without needing to press Enter
 			TextBox:GetPropertyChangedSignal("Text"):Connect(function()
 				CallbackFunc(TextBox.Text)
 			end)
@@ -1981,7 +1959,6 @@ end
 			punishgoatby97mzu:ApplyThemeObj(ContainerStroke, "Color", "Stroke")
  
 			local Header = Instance.new("TextButton", DropdownContainer)
-			Header.Active = false
 			Header.Size = UDim2.new(1, 0, 0, 36)
 			Header.BackgroundTransparency = 1
 			Header.AutoButtonColor = false
@@ -2130,7 +2107,6 @@ end
 			end
  
 			local TriggerBtn = Instance.new("TextButton", Page)
-			TriggerBtn.Active = false
 			TriggerBtn.Size = UDim2.new(1, 0, 0, HasDesc and 52 or 36)
 			TriggerBtn.BackgroundTransparency = 0.55
 			TriggerBtn.AutoButtonColor = false
@@ -2188,7 +2164,6 @@ end
 			punishgoatby97mzu:ApplyThemeObj(Arrow, "ImageColor3", "TextInactive")
  
 			local function UpdateTriggerText()
-				-- If empty OR only "Any" / "All" is selected, automatically display "--"
 				if #SelectedItems == 0 or (#SelectedItems == 1 and (SelectedItems[1] == "Any" or SelectedItems[1] == "All")) then
 					SelectedText.Text = "--"
 				elseif #SelectedItems == 1 then
@@ -2278,7 +2253,6 @@ end
 		ItemList.ScrollBarThickness = 2
 		ItemList.ZIndex = 11
  
-		-- Use Roblox's built-in AutomaticCanvasSize so the search list doesn't lag while scrolling
 		ItemList.AutomaticCanvasSize = Enum.AutomaticSize.Y
 		ItemList.CanvasSize = UDim2.new(0, 0, 0, 0)
 		punishgoatby97mzu:ApplyThemeObj(ItemList, "ScrollBarImageColor3", "Stroke")
@@ -2325,7 +2299,6 @@ end
 				for _, opt in ipairs(OptionsList) do
 					if FilterText == "" or string.find(string.lower(opt), FilterText) then
 						local OptBtn = Instance.new("TextButton", ItemList)
-						OptBtn.Active = false
 						OptBtn.Size = UDim2.new(1, 0, 0, 32)
 						OptBtn.BackgroundTransparency = 0.95
 						OptBtn.AutoButtonColor = false
@@ -2448,7 +2421,6 @@ end
  
 			local SelectObj = {}
 			
-			-- New internal function to force a selection change from outside the library
 			local function SetSelection(newSelection)
 				SelectedItems = {}
 				if type(newSelection) == "table" then
@@ -2463,7 +2435,6 @@ end
 				pcall(function() CallbackFunc(SelectedItems) end)
 			end
  
-			-- Expose the Set function so it can be called from the main script
 			function SelectObj:Set(newSelection)
 				SetSelection(newSelection)
 			end
@@ -2472,14 +2443,12 @@ end
 				SetSelection(newSelection)
 			end
  
-			-- Update the Refresh function to support auto-cleaning stale data
 			function SelectObj:Refresh(NewOptions, KeepSelection)
                 OptionsList = NewOptions or {}
                 
                 if KeepSelection == false then
                     SelectedItems = {}
                 else
-                    -- [SMART AUTO-CLEAN & UPGRADE SYNC]
                     local validSet = {}
                     for _, opt in ipairs(OptionsList) do
                         validSet[opt] = true
@@ -2488,23 +2457,19 @@ end
                     for i = #SelectedItems, 1, -1 do
                         local item = SelectedItems[i]
                         if item ~= "Any" and item ~= "All" and not validSet[item] then
-                            -- MAIN FIX: check whether this is just a level-up/mutation change, NOT actually removed
                             local baseItem = item:match("^(.-)%s*%[Lvl") or item:match("^(.-)%s*%[Lv") or item:match("^(.-)%s*%(") or item
                             
                             local foundEvolution = false
                             for _, opt in ipairs(OptionsList) do
                                 local baseOpt = opt:match("^(.-)%s*%[Lvl") or opt:match("^(.-)%s*%[Lv") or opt:match("^(.-)%s*%(") or opt
                                 
-                                -- If the base name matches (e.g. Passionfruit) but the level differs
                                 if baseItem:lower() == baseOpt:lower() then
-                                    -- Automatically move the selection to the new level name!
                                     SelectedItems[i] = opt
                                     foundEvolution = true
                                     break
                                 end
                             end
                             
-                            -- Only deselect once the base name is truly gone (actually removed from the field)
                             if not foundEvolution then
                                 table.remove(SelectedItems, i)
                             end
@@ -2589,7 +2554,6 @@ end
 				TweenService:Create(KeybindStroke, TweenInfo.new(0.2), { Color = palette.Accent, Transparency = 0.5 })
 					:Play()
  
-				-- One-shot listener: grabs the very next key press, then disconnects itself.
 				captureConn = UserInputService.InputBegan:Connect(function(input, gpe)
 					if gpe then
 						return
@@ -2613,7 +2577,6 @@ end
 				end)
 			end)
  
-			-- Fires the callback whenever the bound key is pressed (ignored while rebinding).
 			UserInputService.InputBegan:Connect(function(input, gpe)
 				if gpe or Listening then
 					return
@@ -2634,8 +2597,6 @@ end
 			return KeybindObj
 		end
  
-		-- Static one-liner, e.g. hints, warnings, small info text. Returns a handle
-		-- with :Set(text) so it can be updated later (e.g. live status text).
 		function Tab:CreateLabel(Text)
 			local LabelHolder = Instance.new("Frame", Page)
 			LabelHolder.Size = UDim2.new(1, 0, 0, 0)
@@ -2660,8 +2621,6 @@ end
 			return LabelObj
 		end
  
-		-- Boxed title + body text, for longer explanations/warnings that a one-line
-		-- Label wouldn't fit nicely.
 		function Tab:CreateParagraph(Title, Content)
 			local Container = Instance.new("Frame", Page)
 			Container.Size = UDim2.new(1, 0, 0, 0)
@@ -2712,8 +2671,6 @@ end
 			return ParagraphObj
 		end
  
-		-- Progress/stat bar with a :Set(value, max?) handle — good for things like
-		-- Cash/Sec, farm progress, or a session counter shown right inside a tab.
 		function Tab:CreateProgressBar(BarName, Max, Default)
 			local MaxValue = Max or 100
 			local Value = math.clamp(Default or 0, 0, MaxValue)
@@ -2780,8 +2737,6 @@ end
 			return BarObj
 		end
  
-		-- Scrollable-friendly history/list block (e.g. "last brainrots found"). Caps
-		-- itself at MaxRows so it can't grow forever like an unbounded log would.
 		function Tab:CreateTable(TableName, MaxRows)
 			MaxRows = MaxRows or 20
  
@@ -2814,7 +2769,7 @@ end
 				Row.Size = UDim2.new(1, 0, 0, 26)
 				Row.BackgroundTransparency = 0.5
 				OrderCounter = OrderCounter - 1
-				Row.LayoutOrder = OrderCounter -- newest row always sorts first
+				Row.LayoutOrder = OrderCounter
 				Instance.new("UICorner", Row).CornerRadius = UDim.new(0, 4)
 				punishgoatby97mzu:ApplyThemeObj(Row, "BackgroundColor3", "ToggleBgOff")
  
@@ -2836,7 +2791,6 @@ end
  
 				table.insert(Rows, 1, Row)
  
-				-- [Cap] never let the history grow forever — trim the oldest row past MaxRows.
 				if #Rows > MaxRows then
 					local oldest = table.remove(Rows)
 					oldest:Destroy()
@@ -2853,9 +2807,6 @@ end
 			return TableObj
 		end
  
-		-- Two-step "arm then confirm" button for dangerous actions (e.g. reset config).
-		-- First click arms it (turns red, shows ConfirmText for 3s); a second click
-		-- within that window fires the callback. Avoids building a full modal/overlay.
 		function Tab:CreateConfirmButton(ButtonName, Description, ConfirmText, Callback)
 			local CallbackFunc = Callback or function() end
 			local HasDesc = type(Description) == "string" and Description ~= ""
@@ -2943,15 +2894,10 @@ end
 	return Window
 end
  
--- ==========================================
--- [🔮] IN-GAME DYNAMIC PREDICTION HUD (DRAGGABLE, RESIZABLE & AUTO-WRAPPING)
--- ==========================================
- 
 local PredictHUD_UI = nil
 local PredictHUD = nil
  
 function punishgoatby97mzu:UpdatePredictHUD(brainrot, rarity, mutation, cps)
-	-- If the toggle is off, pass nil/false as the first argument to hide the HUD
 	if not brainrot then
 		if PredictHUD then
 			PredictHUD.Visible = false
@@ -2961,29 +2907,26 @@ function punishgoatby97mzu:UpdatePredictHUD(brainrot, rarity, mutation, cps)
 	
 	local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 	
-	-- Create a dedicated ScreenGui with max DisplayOrder (2147483647) so it's always above gamepass/inventory UI
 	if not PredictHUD_UI then
 		PredictHUD_UI = Instance.new("ScreenGui")
 		PredictHUD_UI.Name = "punishgoatPredictHUD_UI"
 		PredictHUD_UI.ResetOnSpawn = false
 		PredictHUD_UI.IgnoreGuiInset = true
-		PredictHUD_UI.DisplayOrder = 2147483647 -- Limit maksimum 32-bit integer Roblox
+		PredictHUD_UI.DisplayOrder = 2147483647
 		PredictHUD_UI.Parent = PlayerGui
 	end
 	
-	-- Create the HUD Frame if it doesn't exist yet
 	if not PredictHUD then
 		PredictHUD = Instance.new("Frame")
 		PredictHUD.Name = "PredictHUD"
-		-- Slightly taller (125) to fit the new Cash/Sec row
 		PredictHUD.Size = UDim2.new(0, 210, 0, 125) 
-		PredictHUD.Position = UDim2.new(0.02, 0, 0.22, 0) -- Pas di bawah floating button kiri
+		PredictHUD.Position = UDim2.new(0.02, 0, 0.22, 0)
 		PredictHUD.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
 		PredictHUD.BackgroundTransparency = 0.15
 		PredictHUD.BorderSizePixel = 0
 		PredictHUD.ZIndex = 400
 		PredictHUD.Active = true
-		PredictHUD.ClipsDescendants = true -- Agar resize memotong elemen dengan rapi
+		PredictHUD.ClipsDescendants = true
 		PredictHUD.Parent = PredictHUD_UI
 		
 		local Corner = Instance.new("UICorner", PredictHUD)
@@ -3001,7 +2944,7 @@ function punishgoatby97mzu:UpdatePredictHUD(brainrot, rarity, mutation, cps)
 		Title.Text = "🔮 PREDICTION HUD"
 		Title.Font = Enum.Font.GothamBold
 		Title.TextSize = 11
-		Title.TextColor3 = Color3.fromRGB(172, 0, 0) -- punishgoat Red Accent
+		Title.TextColor3 = Color3.fromRGB(172, 0, 0)
 		Title.ZIndex = 401
 		
 		local Layout = Instance.new("UIListLayout", PredictHUD)
@@ -3016,15 +2959,15 @@ function punishgoatby97mzu:UpdatePredictHUD(brainrot, rarity, mutation, cps)
 		
 		local L_Brainrot = Instance.new("TextLabel", PredictHUD)
 		L_Brainrot.Name = "L_Brainrot"
-		L_Brainrot.Size = UDim2.new(1, -12, 0, 18) -- Sisakan sedikit padding kanan agar tidak menabrak grip
+		L_Brainrot.Size = UDim2.new(1, -12, 0, 18)
 		L_Brainrot.BackgroundTransparency = 1
 		L_Brainrot.Font = Enum.Font.GothamMedium
 		L_Brainrot.TextSize = 11
 		L_Brainrot.TextColor3 = Color3.fromRGB(210, 210, 210)
 		L_Brainrot.TextXAlignment = Enum.TextXAlignment.Left
 		L_Brainrot.RichText = true
-		L_Brainrot.TextWrapped = true -- AKTIFKAN TEXT WRAP AGAR TULISAN PANJANG TURUN KE BAWAH
-		L_Brainrot.AutomaticSize = Enum.AutomaticSize.Y -- TINGGI OTOMATIS MENYESUAIKAN JIKA WRAP
+		L_Brainrot.TextWrapped = true
+		L_Brainrot.AutomaticSize = Enum.AutomaticSize.Y
 		L_Brainrot.ZIndex = 401
 		
 		local L_Rarity = Instance.new("TextLabel", PredictHUD)
@@ -3053,7 +2996,6 @@ function punishgoatby97mzu:UpdatePredictHUD(brainrot, rarity, mutation, cps)
 		L_Mutation.AutomaticSize = Enum.AutomaticSize.Y
 		L_Mutation.ZIndex = 401
  
-		-- Add a new Label for Cash Per Second (CPS)
 		local L_CPS = Instance.new("TextLabel", PredictHUD)
 		L_CPS.Name = "L_CPS"
 		L_CPS.Size = UDim2.new(1, -12, 0, 18)
@@ -3067,7 +3009,6 @@ function punishgoatby97mzu:UpdatePredictHUD(brainrot, rarity, mutation, cps)
 		L_CPS.AutomaticSize = Enum.AutomaticSize.Y
 		L_CPS.ZIndex = 401
  
-		-- Smooth drag-and-drop feature
 		local draggingHUD, dragInputHUD, dragStartHUD, startPosHUD
 		PredictHUD.InputBegan:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -3098,7 +3039,6 @@ function punishgoatby97mzu:UpdatePredictHUD(brainrot, rarity, mutation, cps)
 			end
 		end)
  
-		-- RESIZE GRIP: bottom-right resize handle
 		local ResizeGrip = Instance.new("TextButton", PredictHUD)
 		ResizeGrip.Name = "ResizeGrip"
 		ResizeGrip.Size = UDim2.new(0, 15, 0, 15)
@@ -3134,18 +3074,13 @@ function punishgoatby97mzu:UpdatePredictHUD(brainrot, rarity, mutation, cps)
 		end)
 	end
 	
-	-- Update text
 	PredictHUD.Visible = true
 	PredictHUD.L_Brainrot.Text = "<b>BRAINROT:</b> " .. tostring(brainrot):upper()
 	PredictHUD.L_Rarity.Text = "<b>RARITY:</b> " .. tostring(rarity):upper()
 	PredictHUD.L_Mutation.Text = "<b>MUTATION:</b> " .. tostring(mutation):upper()
-	-- Display the latest estimated Cash Per Second
 	PredictHUD.L_CPS.Text = "<b>CASH/SEC:</b> " .. tostring(cps or "N/A"):upper()
 end
  
--- ==========================================
--- [⚡] DYNAMIC VISUAL ENGINE (EXTREME POTATO MODE) - LOW-END & ANTI-CRASH
--- ==========================================
 function punishgoatby97mzu:SetPotatoMode(state)
     task.spawn(function()
         local Lighting = game:GetService("Lighting")
@@ -3155,10 +3090,6 @@ function punishgoatby97mzu:SetPotatoMode(state)
         if state then
             if self.VisualConnections.Potato then self.VisualConnections.Potato:Disconnect() end
  
-            -- [BUG FIX] Build a "protected" check (characters + camera) so Potato Mode only
-            -- strips the map/props, not the player's own avatar or viewmodel.
-            -- With StreamingEnabled, DescendantAdded fires for every part that streams in,
-            -- including character parts respawning — without this guard those get flattened too.
             local function IsProtected(obj)
                 local camera = Workspace.CurrentCamera
                 if camera and obj:IsDescendantOf(camera) then
@@ -3172,15 +3103,13 @@ function punishgoatby97mzu:SetPotatoMode(state)
                 return false
             end
  
-            -- 1. Aggressively disable global lighting
             settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
             Lighting.GlobalShadows = false
             Lighting.EnvironmentDiffuseScale = 0
             Lighting.EnvironmentSpecularScale = 0
-            Lighting.Brightness = 2 -- Slightly raised so the map isn't pitch black once it's stripped down
+            Lighting.Brightness = 2
             Lighting.FogEnd = 9e9
  
-            -- [FIX CRASH]: every Terrain property change must be wrapped in its own pcall!
             if Terrain then
                 pcall(function() Terrain.WaterWaveSize = 0 end)
                 pcall(function() Terrain.WaterWaveSpeed = 0 end)
@@ -3189,44 +3118,36 @@ function punishgoatby97mzu:SetPotatoMode(state)
                 pcall(function() Terrain.Decoration = false end)
             end
  
-            -- 2. Core function that strips down every visual (extreme low-end mode)
             local function AnnihilateVisuals(obj)
                 if IsProtected(obj) then return end
                 pcall(function()
                     if obj:IsA("BasePart") and not obj:IsA("Terrain") then
-                        -- Flatten the material (remove reflections)
                         obj.Material = Enum.Material.SmoothPlastic
                         obj.Reflectance = 0
                         obj.CastShadow = false
                         
-                        -- [TARGET: BRAINROT & MAP TEXTURES]: strip the original 3D model appearance
                         if obj:IsA("MeshPart") then
                             obj.TextureID = "" 
                         end
                     elseif obj:IsA("SpecialMesh") then
                         obj.TextureId = "" 
                     elseif obj:IsA("SurfaceAppearance") then
-                        -- Destroy Roblox's built-in HD/PBR texture system
                         obj:Destroy() 
                     elseif obj:IsA("Decal") or obj:IsA("Texture") then
                         obj.Transparency = 1 
                     elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Beam") or obj:IsA("Smoke") or obj:IsA("Fire") or obj:IsA("Sparkles") or obj:IsA("Highlight") then
-                        -- Disable ALL VFX including Highlight/Outline
                         obj.Enabled = false 
                     elseif obj:IsA("PostEffect") or obj:IsA("Atmosphere") or obj:IsA("Sky") then
                         obj.Enabled = false 
                     elseif obj:IsA("Light") then
-                        -- Disable PointLight/SpotLight so the GPU skips lighting calculations
                         obj.Enabled = false 
                     end
                 end)
             end
  
-            -- 3. Run an O(N) chunked pass across the whole map (freeze-free)
             local allObjects = Workspace:GetDescendants()
             for i, obj in ipairs(allObjects) do
                 AnnihilateVisuals(obj)
-                -- Yield every 500 objects so the frame rate doesn't drop during the forced re-render
                 if i % 500 == 0 then task.wait() end 
             end
  
@@ -3234,13 +3155,11 @@ function punishgoatby97mzu:SetPotatoMode(state)
                 AnnihilateVisuals(obj)
             end
  
-            -- 4. Real-time O(1) guard (auto-strips new Brainrot/VFX the moment they spawn)
             self.VisualConnections.Potato = Workspace.DescendantAdded:Connect(function(obj)
                 AnnihilateVisuals(obj)
             end)
  
         else
-            -- DISABLE POTATO MODE
             if self.VisualConnections.Potato then 
                 self.VisualConnections.Potato:Disconnect() 
                 self.VisualConnections.Potato = nil 
@@ -3252,7 +3171,6 @@ function punishgoatby97mzu:SetPotatoMode(state)
 end
  
 function punishgoatby97mzu:SetRTXMode(state)
-    -- [FIX]: wrapped in task.spawn
     task.spawn(function()
         local Lighting = game:GetService("Lighting")
         local Workspace = game:GetService("Workspace")
