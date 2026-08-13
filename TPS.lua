@@ -1,4 +1,5 @@
 local punishgoatby97mzu = {
+	VisualConnections = {},
 	Instances = {},
 	ThemeChangedHooks = {},
 	CurrentTheme = "punishgoat",
@@ -18,6 +19,126 @@ local punishgoatby97mzu = {
 	},
 }
  
+punishgoatby97mzu.Themes.Dark = {
+	MainBg = Color3.fromRGB(15, 15, 16),
+	Stroke = Color3.fromRGB(85, 85, 94),
+	Accent = Color3.fromRGB(58, 58, 120),
+	Accentpunish = Color3.fromRGB(207, 207, 226),
+	Text = Color3.fromRGB(230, 230, 230),
+	TextInactive = Color3.fromRGB(250, 250, 250),
+	ToggleBgOff = Color3.fromRGB(53, 53, 59),
+	ToggleBtnBg = Color3.fromRGB(36, 36, 40),
+	ToggleDot = Color3.fromRGB(191, 191, 217),
+	SectionTitle = Color3.fromRGB(153, 153, 153),
+}
+punishgoatby97mzu.Themes.Light = {
+	MainBg = Color3.fromRGB(79, 79, 87),
+	Stroke = Color3.fromRGB(85, 85, 94),
+	Accent = Color3.fromRGB(203, 203, 230),
+	Accentpunish = Color3.fromRGB(207, 207, 226),
+	Text = Color3.fromRGB(230, 230, 230),
+	TextInactive = Color3.fromRGB(250, 250, 250),
+	ToggleBgOff = Color3.fromRGB(53, 53, 59),
+	ToggleBtnBg = Color3.fromRGB(36, 36, 40),
+	ToggleDot = Color3.fromRGB(191, 191, 217),
+	SectionTitle = Color3.fromRGB(153, 153, 153),
+}
+punishgoatby97mzu.Themes.Ocean = {
+	MainBg = Color3.fromRGB(6, 35, 56),
+	Stroke = Color3.fromRGB(18, 101, 161),
+	Accent = Color3.fromRGB(51, 170, 255),
+	Accentpunish = Color3.fromRGB(179, 223, 255),
+	Text = Color3.fromRGB(214, 232, 245),
+	TextInactive = Color3.fromRGB(247, 250, 253),
+	ToggleBgOff = Color3.fromRGB(11, 64, 101),
+	ToggleBtnBg = Color3.fromRGB(8, 43, 69),
+	ToggleDot = Color3.fromRGB(153, 213, 255),
+	SectionTitle = Color3.fromRGB(82, 165, 224),
+}
+punishgoatby97mzu.Themes.Cyberpunk = {
+	MainBg = Color3.fromRGB(76, 4, 64),
+	Stroke = Color3.fromRGB(170, 9, 143),
+	Accent = Color3.fromRGB(255, 102, 229),
+	Accentpunish = Color3.fromRGB(255, 179, 242),
+	Text = Color3.fromRGB(247, 212, 241),
+	TextInactive = Color3.fromRGB(253, 246, 252),
+	ToggleBgOff = Color3.fromRGB(107, 6, 90),
+	ToggleBtnBg = Color3.fromRGB(73, 4, 61),
+	ToggleDot = Color3.fromRGB(255, 153, 238),
+	SectionTitle = Color3.fromRGB(235, 71, 207),
+}
+punishgoatby97mzu.Themes.Matcha = {
+	MainBg = Color3.fromRGB(30, 52, 20),
+	Stroke = Color3.fromRGB(76, 129, 49),
+	Accent = Color3.fromRGB(143, 233, 99),
+	Accentpunish = Color3.fromRGB(208, 242, 192),
+	Text = Color3.fromRGB(227, 236, 223),
+	TextInactive = Color3.fromRGB(249, 251, 249),
+	ToggleBgOff = Color3.fromRGB(48, 81, 31),
+	ToggleBtnBg = Color3.fromRGB(33, 55, 21),
+	ToggleDot = Color3.fromRGB(193, 237, 171),
+	SectionTitle = Color3.fromRGB(141, 189, 117),
+}
+punishgoatby97mzu.Themes.Silver = {
+	MainBg = Color3.fromRGB(53, 58, 63),
+	Stroke = Color3.fromRGB(82, 89, 96),
+	Accent = Color3.fromRGB(202, 217, 231),
+	Accentpunish = Color3.fromRGB(206, 217, 227),
+	Text = Color3.fromRGB(230, 230, 230),
+	TextInactive = Color3.fromRGB(250, 250, 250),
+	ToggleBgOff = Color3.fromRGB(52, 56, 61),
+	ToggleBtnBg = Color3.fromRGB(35, 38, 41),
+	ToggleDot = Color3.fromRGB(190, 204, 218),
+	SectionTitle = Color3.fromRGB(153, 153, 153),
+}
+punishgoatby97mzu.Themes.White = {
+	MainBg = Color3.fromRGB(86, 86, 86),
+	Stroke = Color3.fromRGB(89, 89, 89),
+	Accent = Color3.fromRGB(228, 205, 205),
+	Accentpunish = Color3.fromRGB(224, 209, 209),
+	Text = Color3.fromRGB(230, 230, 230),
+	TextInactive = Color3.fromRGB(250, 250, 250),
+	ToggleBgOff = Color3.fromRGB(56, 56, 56),
+	ToggleBtnBg = Color3.fromRGB(38, 38, 38),
+	ToggleDot = Color3.fromRGB(214, 194, 194),
+	SectionTitle = Color3.fromRGB(153, 153, 153),
+}
+punishgoatby97mzu.Themes.Platinum = {
+	MainBg = Color3.fromRGB(50, 73, 84),
+	Stroke = Color3.fromRGB(67, 97, 112),
+	Accent = Color3.fromRGB(196, 224, 238),
+	Accentpunish = Color3.fromRGB(200, 222, 234),
+	Text = Color3.fromRGB(228, 230, 231),
+	TextInactive = Color3.fromRGB(250, 250, 250),
+	ToggleBgOff = Color3.fromRGB(42, 61, 70),
+	ToggleBtnBg = Color3.fromRGB(29, 41, 48),
+	ToggleDot = Color3.fromRGB(181, 212, 227),
+	SectionTitle = Color3.fromRGB(138, 158, 168),
+}
+punishgoatby97mzu.Themes.Crimson = {
+	MainBg = Color3.fromRGB(72, 8, 19),
+	Stroke = Color3.fromRGB(161, 18, 42),
+	Accent = Color3.fromRGB(255, 102, 128),
+	Accentpunish = Color3.fromRGB(255, 179, 191),
+	Text = Color3.fromRGB(245, 214, 219),
+	TextInactive = Color3.fromRGB(253, 247, 248),
+	ToggleBgOff = Color3.fromRGB(101, 11, 26),
+	ToggleBtnBg = Color3.fromRGB(69, 8, 18),
+	ToggleDot = Color3.fromRGB(255, 153, 170),
+	SectionTitle = Color3.fromRGB(224, 82, 105),
+}
+punishgoatby97mzu.Themes.Gold = {
+	MainBg = Color3.fromRGB(93, 71, 5),
+	Stroke = Color3.fromRGB(170, 129, 9),
+	Accent = Color3.fromRGB(255, 230, 153),
+	Accentpunish = Color3.fromRGB(255, 236, 179),
+	Text = Color3.fromRGB(247, 238, 212),
+	TextInactive = Color3.fromRGB(253, 252, 246),
+	ToggleBgOff = Color3.fromRGB(107, 81, 6),
+	ToggleBtnBg = Color3.fromRGB(73, 55, 4),
+	ToggleDot = Color3.fromRGB(255, 230, 153),
+	SectionTitle = Color3.fromRGB(235, 194, 71),
+}
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
@@ -26,13 +147,14 @@ local LocalPlayer = Players.LocalPlayer
 function punishgoatby97mzu:ApplyThemeObj(Inst, Prop, ThemeType)
 	table.insert(self.Instances, { Inst = Inst, Prop = Prop, Type = ThemeType })
 	local palette = self.Themes[self.CurrentTheme]
-	Inst[Prop] = palette[ThemeType]
+	if palette[ThemeType] ~= nil then Inst[Prop] = palette[ThemeType] end
 	return Inst
 end
  
 function punishgoatby97mzu:ChangeTheme(ThemeName)
 	self.CurrentTheme = ThemeName
 	local palette = self.Themes[ThemeName]
+	if not palette then return end
 	for _, obj in pairs(self.Instances) do
 		if obj.Inst and obj.Inst.Parent then
 			TweenService:Create(obj.Inst, TweenInfo.new(0.3), { [obj.Prop] = palette[obj.Type] }):Play()
@@ -334,6 +456,7 @@ local maxHeight = 400 + 40
 	local ProfileCard
  
 	local isMinimized = false
+	local isMaximized = false
 	local preMinSize = Main.Size
 	local preMinPos = Main.Position
 	local isMinTweening = false
