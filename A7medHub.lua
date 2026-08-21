@@ -7,9 +7,15 @@ local HttpService = game:GetService("HttpService")
 local Player = Players.LocalPlayer
 local PlayerGui = Player:WaitForChild("PlayerGui")
 
--- إزالة الواجهة القديمة إن وجدت
+-- إزالة الواجهة القديمة
 local Old = PlayerGui:FindFirstChild("A7medHub")
 if Old then Old:Destroy() end
+
+--// إعدادات الألوان (Neon Blue Theme)
+local NeonBlue = Color3.fromRGB(0, 170, 255)
+local DarkBg = Color3.fromRGB(10, 10, 16)
+local DarkerBg = Color3.fromRGB(6, 6, 10)
+local TextColor = Color3.fromRGB(240, 240, 255)
 
 --// إنشاء الواجهة الرئيسية
 local Gui = Instance.new("ScreenGui")
@@ -18,13 +24,13 @@ Gui.ResetOnSpawn = false
 Gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 Gui.Parent = PlayerGui
 
---// الإطار الرئيسي (تم تكبيره لاستيعاب التبويبات)
+--// الإطار الرئيسي
 local Frame = Instance.new("Frame")
 Frame.Name = "MainFrame"
-Frame.Size = UDim2.fromOffset(460, 420)
-Frame.Position = UDim2.new(0.5, 0, 1.5, 0)
+Frame.Size = UDim2.fromOffset(480, 460)
+Frame.Position = UDim2.new(0.5, 0, 1.5, 0) -- يبدأ من الأسفل للأنيميشن
 Frame.AnchorPoint = Vector2.new(0.5, 0.5)
-Frame.BackgroundColor3 = Color3.fromRGB(12, 12, 18)
+Frame.BackgroundColor3 = DarkBg
 Frame.BorderSizePixel = 0
 Frame.Parent = Gui
 
@@ -33,33 +39,80 @@ FrameCorner.CornerRadius = UDim.new(0, 16)
 FrameCorner.Parent = Frame
 
 local Stroke = Instance.new("UIStroke")
-Stroke.Thickness = 1.5
-Stroke.Transparency = 0.3
-Stroke.Color = Color3.fromRGB(19, 103, 229)
+Stroke.Thickness = 2
+Stroke.Transparency = 0.2
+Stroke.Color = NeonBlue
 Stroke.Parent = Frame
 
---// شريط العنوان والسحب
+-- ==========================================
+-- TopBar + GIF Logo
+-- ==========================================
 local TopBar = Instance.new("Frame")
 TopBar.Name = "TopBar"
-TopBar.Size = UDim2.new(1, 0, 0, 50)
-TopBar.BackgroundColor3 = Color3.fromRGB(18, 18, 25)
+TopBar.Size = UDim2.new(1, 0, 0, 55)
+TopBar.BackgroundColor3 = DarkerBg
 TopBar.BorderSizePixel = 0
 TopBar.Parent = Frame
 local TopBarCorner = Instance.new("UICorner")
 TopBarCorner.CornerRadius = UDim.new(0, 16)
 TopBarCorner.Parent = TopBar
 
+--// GIF Logo في الـ TopBar
+local GIFFrames = {
+    "107268249992959", "104444112835205", "115157039177204", "111931487689142",
+    "139619104460573", "117772948212179", "123663025657786", "138532394395836"
+}
+local GIF = Instance.new("ImageLabel")
+GIF.Name = "AnimatedLogo"
+GIF.Size = UDim2.fromOffset(35, 35)
+GIF.Position = UDim2.fromOffset(15, 10)
+GIF.BackgroundTransparency = 1
+GIF.Image = "rbxassetid://" .. GIFFrames[1]
+GIF.Parent = TopBar
+
+task.spawn(function()
+    local Assets = {}
+    for _, ID in ipairs(GIFFrames) do
+        local Img = Instance.new("ImageLabel")
+        Img.Image = "rbxassetid://" .. ID
+        table.insert(Assets, Img)
+    end
+    pcall(function() ContentProvider:PreloadAsync(Assets) end)
+    for _, Img in ipairs(Assets) do Img:Destroy() end
+    
+    local FrameSpeed = 0.08
+    while Gui.Parent do
+        for _, ImageID in ipairs(GIFFrames) do
+            if not Gui.Parent then break end
+            GIF.Image = "rbxassetid://" .. ImageID
+            task.wait(FrameSpeed)
+        end
+    end
+end)
+
+--// العنوان
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -70, 1, 0)
+Title.Position = UDim2.fromOffset(60, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "A7med Hub"
+Title.TextColor3 = TextColor
+Title.TextSize = 22
+Title.Font = Enum.Font.GothamBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = TopBar
+
 --// زر الإغلاق
 local CloseButton = Instance.new("TextButton")
 CloseButton.Name = "CloseButton"
-CloseButton.Size = UDim2.fromOffset(32, 32)
+CloseButton.Size = UDim2.fromOffset(35, 35)
 CloseButton.Position = UDim2.new(1, -10, 0.5, 0)
 CloseButton.AnchorPoint = Vector2.new(1, 0.5)
-CloseButton.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+CloseButton.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
 CloseButton.BorderSizePixel = 0
 CloseButton.Text = "✕"
 CloseButton.TextColor3 = Color3.fromRGB(255, 80, 80)
-CloseButton.TextSize = 18
+CloseButton.TextSize = 20
 CloseButton.Font = Enum.Font.GothamBold
 CloseButton.AutoButtonColor = false
 CloseButton.Parent = TopBar
@@ -68,59 +121,52 @@ CloseCorner.CornerRadius = UDim.new(0, 8)
 CloseCorner.Parent = CloseButton
 
 CloseButton.MouseEnter:Connect(function()
-    TweenService:Create(CloseButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(255, 80, 80), TextColor3 = Color3.fromRGB(255,255,255)}):Play()
+    TweenService:Create(CloseButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 60, 60), TextColor3 = Color3.fromRGB(255,255,255)}):Play()
 end)
 CloseButton.MouseLeave:Connect(function()
-    TweenService:Create(CloseButton, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(25, 25, 35), TextColor3 = Color3.fromRGB(255, 80, 80)}):Play()
+    TweenService:Create(CloseButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(30, 30, 40), TextColor3 = Color3.fromRGB(255, 80, 80)}):Play()
 end)
 
---// العنوان
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -60, 1, 0)
-Title.Position = UDim2.fromOffset(15, 0)
-Title.BackgroundTransparency = 1
-Title.Text = "A7med Hub"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 20
-Title.Font = Enum.Font.GothamBold
-Title.TextXAlignment = Enum.TextXAlignment.Left
-Title.Parent = TopBar
-
---// نظام التبويبات (Tabs)
+-- ==========================================
+-- نظام التبويبات (Tabs)
+-- ==========================================
 local TabContainer = Instance.new("Frame")
 TabContainer.Name = "TabContainer"
-TabContainer.Size = UDim2.new(1, -20, 0, 40)
-TabContainer.Position = UDim2.fromOffset(10, 60)
+TabContainer.Size = UDim2.new(1, -20, 0, 45)
+TabContainer.Position = UDim2.fromOffset(10, 65)
 TabContainer.BackgroundTransparency = 1
 TabContainer.Parent = Frame
 
 local TabsList = Instance.new("UIListLayout")
 TabsList.FillDirection = Enum.FillDirection.Horizontal
 TabsList.SortOrder = Enum.SortOrder.LayoutOrder
-TabsList.Padding = UDim.new(0, 8)
+TabsList.Padding = UDim.new(0, 10)
 TabsList.Parent = TabContainer
 
 local TabContentContainer = Instance.new("Frame")
 TabContentContainer.Name = "TabContentContainer"
-TabContentContainer.Size = UDim2.new(1, -20, 1, -110)
-TabContentContainer.Position = UDim2.fromOffset(10, 110)
-TabContentContainer.BackgroundColor3 = Color3.fromRGB(16, 16, 22)
+TabContentContainer.Size = UDim2.new(1, -20, 1, -120)
+TabContentContainer.Position = UDim2.fromOffset(10, 120)
+TabContentContainer.BackgroundColor3 = DarkerBg
 TabContentContainer.BorderSizePixel = 0
 TabContentContainer.Parent = Frame
 local ContentCorner = Instance.new("UICorner")
-ContentCorner.CornerRadius = UDim.new(0, 10)
+ContentCorner.CornerRadius = UDim.new(0, 12)
 ContentCorner.Parent = TabContentContainer
+local ContentStroke = Instance.new("UIStroke")
+ContentStroke.Color = Color3.fromRGB(30, 30, 40)
+ContentStroke.Thickness = 1
+ContentStroke.Parent = TabContentContainer
 
---// دالة إنشاء زر تبويب
 local function CreateTabButton(Name, Text, LayoutOrder)
     local Btn = Instance.new("TextButton")
     Btn.Name = Name
-    Btn.Size = UDim2.new(0, 100, 1, 0)
+    Btn.Size = UDim2.new(0, 105, 1, 0)
     Btn.LayoutOrder = LayoutOrder
-    Btn.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    Btn.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
     Btn.BorderSizePixel = 0
     Btn.Text = Text
-    Btn.TextColor3 = Color3.fromRGB(150, 150, 160)
+    Btn.TextColor3 = Color3.fromRGB(130, 130, 150)
     Btn.TextSize = 15
     Btn.Font = Enum.Font.GothamBold
     Btn.AutoButtonColor = false
@@ -130,23 +176,27 @@ local function CreateTabButton(Name, Text, LayoutOrder)
     Corner.CornerRadius = UDim.new(0, 8)
     Corner.Parent = Btn
     
-    return Btn
+    local BtnStroke = Instance.new("UIStroke")
+    BtnStroke.Color = Color3.fromRGB(40, 40, 50)
+    BtnStroke.Thickness = 1
+    BtnStroke.Parent = Btn
+    
+    return Btn, BtnStroke
 end
 
-local TabMain = CreateTabButton("TabMain", "الرئيسية", 1)
-local TabFootball = CreateTabButton("TabFootball", "Football", 2)
-local TabFun = CreateTabButton("TabFun", "Fun", 3)
-local TabFFS = CreateTabButton("TabFFS", "FFS", 4)
+local TabMain, StrokeMain = CreateTabButton("TabMain", "الرئيسية", 1)
+local TabFootball, StrokeFootball = CreateTabButton("TabFootball", "Football", 2)
+local TabFun, StrokeFun = CreateTabButton("TabFun", "Fun", 3)
+local TabFFS, StrokeFFS = CreateTabButton("TabFFS", "FFS", 4)
 
---// دالة إنشاء محتوى التبويب
 local function CreateTabContent(Name)
     local Content = Instance.new("ScrollingFrame")
     Content.Name = Name
     Content.Size = UDim2.new(1, 0, 1, 0)
     Content.BackgroundTransparency = 1
     Content.BorderSizePixel = 0
-    Content.ScrollBarThickness = 4
-    Content.ScrollBarImageColor3 = Color3.fromRGB(19, 103, 229)
+    Content.ScrollBarThickness = 5
+    Content.ScrollBarImageColor3 = NeonBlue
     Content.Visible = false
     Content.Parent = TabContentContainer
     
@@ -170,14 +220,17 @@ local ContentFootball = CreateTabContent("ContentFootball")
 local ContentFun = CreateTabContent("ContentFun")
 local ContentFFS = CreateTabContent("ContentFFS")
 
---// دالة التبديل بين التبويبات
-local function SwitchTab(ActiveTab, ActiveContent)
-    for _, btn in ipairs(TabContainer:GetChildren()) do
-        if btn:IsA("TextButton") then
-            TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 25, 35), TextColor3 = Color3.fromRGB(150, 150, 160)}):Play()
-        end
+local function SwitchTab(ActiveTab, ActiveStroke, ActiveContent)
+    local tabs = {TabMain, TabFootball, TabFun, TabFFS}
+    local strokes = {StrokeMain, StrokeFootball, StrokeFun, StrokeFFS}
+    
+    for i, btn in ipairs(tabs) do
+        TweenService:Create(btn, TweenInfo.new(0.25), {BackgroundColor3 = Color3.fromRGB(20, 20, 30), TextColor3 = Color3.fromRGB(130, 130, 150)}):Play()
+        TweenService:Create(strokes[i], TweenInfo.new(0.25), {Color = Color3.fromRGB(40, 40, 50)}):Play()
     end
-    TweenService:Create(ActiveTab, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(19, 103, 229), TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+    
+    TweenService:Create(ActiveTab, TweenInfo.new(0.25), {BackgroundColor3 = Color3.fromRGB(0, 30, 50), TextColor3 = NeonBlue}):Play()
+    TweenService:Create(ActiveStroke, TweenInfo.new(0.25), {Color = NeonBlue}):Play()
     
     for _, content in ipairs(TabContentContainer:GetChildren()) do
         if content:IsA("ScrollingFrame") then
@@ -187,24 +240,25 @@ local function SwitchTab(ActiveTab, ActiveContent)
     ActiveContent.Visible = true
 end
 
--- تعيين التبويب الافتراضي
-SwitchTab(TabMain, ContentMain)
+SwitchTab(TabMain, StrokeMain, ContentMain)
 
-TabMain.MouseButton1Click:Connect(function() SwitchTab(TabMain, ContentMain) end)
-TabFootball.MouseButton1Click:Connect(function() SwitchTab(TabFootball, ContentFootball) end)
-TabFun.MouseButton1Click:Connect(function() SwitchTab(TabFun, ContentFun) end)
-TabFFS.MouseButton1Click:Connect(function() SwitchTab(TabFFS, ContentFFS) end)
+TabMain.MouseButton1Click:Connect(function() SwitchTab(TabMain, StrokeMain, ContentMain) end)
+TabFootball.MouseButton1Click:Connect(function() SwitchTab(TabFootball, StrokeFootball, ContentFootball) end)
+TabFun.MouseButton1Click:Connect(function() SwitchTab(TabFun, StrokeFun, ContentFun) end)
+TabFFS.MouseButton1Click:Connect(function() SwitchTab(TabFFS, StrokeFFS, ContentFFS) end)
 
---// دالة إنشاء زر إجراء (Action Button)
+-- ==========================================
+-- دالة إنشاء الأزرار (Neon Style)
+-- ==========================================
 local function CreateActionButton(Name, Text, Parent, Order)
     local Btn = Instance.new("TextButton")
     Btn.Name = Name
-    Btn.Size = UDim2.new(1, 0, 0, 45)
+    Btn.Size = UDim2.new(1, 0, 0, 48)
     Btn.LayoutOrder = Order or 1
-    Btn.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    Btn.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
     Btn.BorderSizePixel = 0
     Btn.Text = Text
-    Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Btn.TextColor3 = TextColor
     Btn.TextSize = 16
     Btn.Font = Enum.Font.GothamBold
     Btn.AutoButtonColor = false
@@ -215,37 +269,35 @@ local function CreateActionButton(Name, Text, Parent, Order)
     Corner.Parent = Btn
     
     local BtnStroke = Instance.new("UIStroke")
-    BtnStroke.Thickness = 1
-    BtnStroke.Transparency = 0.7
-    BtnStroke.Color = Color3.fromRGB(70, 70, 85)
+    BtnStroke.Thickness = 1.5
+    BtnStroke.Transparency = 0.6
+    BtnStroke.Color = NeonBlue
     BtnStroke.Parent = Btn
     
     Btn.MouseEnter:Connect(function()
-        TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(19, 103, 229)}):Play()
-        TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0}):Play()
+        TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 40, 60)}):Play()
+        TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0, Color = Color3.fromRGB(50, 200, 255)}):Play()
     end)
     Btn.MouseLeave:Connect(function()
-        TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(25, 25, 35)}):Play()
-        TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.7}):Play()
+        TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(15, 15, 25)}):Play()
+        TweenService:Create(BtnStroke, TweenInfo.new(0.2), {Transparency = 0.6, Color = NeonBlue}):Play()
     end)
     
     return Btn
 end
 
 -- ==========================================
--- محتوى التبويبات
+-- 1. محتوى الرئيسية (Main)
 -- ==========================================
-
---// 1. تبويب الرئيسية (Main)
-local BtnMainExecute = CreateActionButton("BtnMainExecute", "تفعيل TPS & Touchline", ContentMain, 1)
+local BtnMainExecute = CreateActionButton("BtnMainExecute", "⚡ تفعيل TPS & Touchline", ContentMain, 1)
 
 -- نافذة السؤال المنبثقة (Prompt)
 local PromptFrame = Instance.new("Frame")
 PromptFrame.Name = "PromptFrame"
-PromptFrame.Size = UDim2.fromOffset(300, 140)
+PromptFrame.Size = UDim2.fromOffset(320, 150)
 PromptFrame.Position = UDim2.fromScale(0.5, 0.5)
 PromptFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-PromptFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 28)
+PromptFrame.BackgroundColor3 = DarkerBg
 PromptFrame.BorderSizePixel = 0
 PromptFrame.Visible = false
 PromptFrame.ZIndex = 100
@@ -254,8 +306,8 @@ local PromptCorner = Instance.new("UICorner")
 PromptCorner.CornerRadius = UDim.new(0, 12)
 PromptCorner.Parent = PromptFrame
 local PromptStroke = Instance.new("UIStroke")
-PromptStroke.Color = Color3.fromRGB(19, 103, 229)
-PromptStroke.Thickness = 1.5
+PromptStroke.Color = NeonBlue
+PromptStroke.Thickness = 2
 PromptStroke.Parent = PromptFrame
 
 local PromptText = Instance.new("TextLabel")
@@ -263,18 +315,18 @@ PromptText.Size = UDim2.new(1, -20, 0, 60)
 PromptText.Position = UDim2.fromOffset(10, 15)
 PromptText.BackgroundTransparency = 1
 PromptText.Text = "هل تريد تشغيل البينج معهما؟"
-PromptText.TextColor3 = Color3.fromRGB(255, 255, 255)
-PromptText.TextSize = 16
+PromptText.TextColor3 = TextColor
+PromptText.TextSize = 17
 PromptText.Font = Enum.Font.GothamBold
 PromptText.ZIndex = 101
 PromptText.Parent = PromptFrame
 
 local PromptYes = Instance.new("TextButton")
-PromptYes.Size = UDim2.fromOffset(100, 35)
-PromptYes.Position = UDim2.fromOffset(40, 85)
-PromptYes.BackgroundColor3 = Color3.fromRGB(19, 103, 229)
+PromptYes.Size = UDim2.fromOffset(110, 38)
+PromptYes.Position = UDim2.fromOffset(40, 90)
+PromptYes.BackgroundColor3 = Color3.fromRGB(0, 100, 150)
 PromptYes.BorderSizePixel = 0
-PromptYes.Text = "Yes"
+PromptYes.Text = "Yes (تشغيل)"
 PromptYes.TextColor3 = Color3.fromRGB(255, 255, 255)
 PromptYes.TextSize = 15
 PromptYes.Font = Enum.Font.GothamBold
@@ -285,11 +337,11 @@ PYCorner.CornerRadius = UDim.new(0, 6)
 PYCorner.Parent = PromptYes
 
 local PromptNo = Instance.new("TextButton")
-PromptNo.Size = UDim2.fromOffset(100, 35)
-PromptNo.Position = UDim2.fromOffset(160, 85)
-PromptNo.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+PromptNo.Size = UDim2.fromOffset(110, 38)
+PromptNo.Position = UDim2.fromOffset(170, 90)
+PromptNo.BackgroundColor3 = Color3.fromRGB(150, 30, 30)
 PromptNo.BorderSizePixel = 0
-PromptNo.Text = "No"
+PromptNo.Text = "No (إلغاء)"
 PromptNo.TextColor3 = Color3.fromRGB(255, 255, 255)
 PromptNo.TextSize = 15
 PromptNo.Font = Enum.Font.GothamBold
@@ -299,16 +351,16 @@ local PNCorner = Instance.new("UICorner")
 PNCorner.CornerRadius = UDim.new(0, 6)
 PNCorner.Parent = PromptNo
 
--- منطق التنفيذ الرئيسي
 BtnMainExecute.MouseButton1Click:Connect(function()
     PromptFrame.Visible = true
-    PromptFrame.Position = UDim2.fromScale(0.5, 0.5) -- Reset position for animation
-    TweenService:Create(PromptFrame, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = UDim2.fromScale(0.5, 0.5)}):Play()
+    PromptFrame.Position = UDim2.fromScale(0.5, 0.6)
+    TweenService:Create(PromptFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = UDim2.fromScale(0.5, 0.5)}):Play()
 end)
 
 PromptNo.MouseButton1Click:Connect(function()
+    TweenService:Create(PromptFrame, TweenInfo.new(0.2), {Position = UDim2.fromScale(0.5, 0.6)}):Play()
+    task.wait(0.2)
     PromptFrame.Visible = false
-    -- تشغيل السكربين الأساسيين فقط
     task.spawn(function()
         pcall(function() loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/07d323b4106c0dee4680725e35bef651.lua"))() end)
         pcall(function() loadstring(game:HttpGet("https://pastefy.app/hf5DG9ce/raw"))() end)
@@ -316,8 +368,9 @@ PromptNo.MouseButton1Click:Connect(function()
 end)
 
 PromptYes.MouseButton1Click:Connect(function()
+    TweenService:Create(PromptFrame, TweenInfo.new(0.2), {Position = UDim2.fromScale(0.5, 0.6)}):Play()
+    task.wait(0.2)
     PromptFrame.Visible = false
-    -- تشغيل الثلاثة سكربتات
     task.spawn(function()
         pcall(function() loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/07d323b4106c0dee4680725e35bef651.lua"))() end)
         pcall(function() loadstring(game:HttpGet("https://pastefy.app/hf5DG9ce/raw"))() end)
@@ -325,69 +378,88 @@ PromptYes.MouseButton1Click:Connect(function()
     end)
 end)
 
---// 2. تبويب Football (فارغ أو رسالة ترحيب)
+-- ==========================================
+-- 2. محتوى Football
+-- ==========================================
 local FootballLabel = Instance.new("TextLabel")
 FootballLabel.Size = UDim2.new(1, 0, 0, 40)
 FootballLabel.LayoutOrder = 1
 FootballLabel.BackgroundTransparency = 1
-FootballLabel.Text = "محتوى Football قيد التطوير..."
-FootballLabel.TextColor3 = Color3.fromRGB(150, 150, 160)
+FootballLabel.Text = "🎯 محتوى Football قيد التطوير..."
+FootballLabel.TextColor3 = Color3.fromRGB(130, 130, 150)
 FootballLabel.TextSize = 16
 FootballLabel.Font = Enum.Font.GothamMedium
 FootballLabel.Parent = ContentFootball
 
---// 3. تبويب Fun (VR7)
-local BtnVR7 = CreateActionButton("BtnVR7", "تشغيل VR7", ContentFun, 1)
+-- ==========================================
+-- 3. محتوى Fun (VR7)
+-- ==========================================
+local BtnVR7 = CreateActionButton("BtnVR7", "🎮 تشغيل VR7", ContentFun, 1)
 BtnVR7.MouseButton1Click:Connect(function()
     task.spawn(function()
         pcall(function() loadstring(game:HttpGet("https://raw.githubusercontent.com/VR7ss/OMK/refs/heads/main/VR7-ON-TOP"))() end)
     end)
 end)
 
---// 4. تبويب FFS (أكواد FastFlags)
+-- ==========================================
+-- 4. محتوى FFS (محسّن لمنع الاقتطاع)
+-- ==========================================
 local FFSLabel = Instance.new("TextLabel")
-FFSLabel.Size = UDim2.new(1, 0, 0, 20)
+FFSLabel.Size = UDim2.new(1, 0, 0, 25)
 FFSLabel.LayoutOrder = 1
 FFSLabel.BackgroundTransparency = 1
-FFSLabel.Text = "الصق أكواد JSON هنا:"
-FFSLabel.TextColor3 = Color3.fromRGB(19, 103, 229)
-FFSLabel.TextSize = 14
+FFSLabel.Text = "📋 الصق أكواد FastFlags (JSON) هنا:"
+FFSLabel.TextColor3 = NeonBlue
+FFSLabel.TextSize = 15
 FFSLabel.Font = Enum.Font.GothamBold
 FFSLabel.TextXAlignment = Enum.TextXAlignment.Left
 FFSLabel.Parent = ContentFFS
 
+-- حاوية التمرير لمنع اقتطاع النص
+local FFSContainer = Instance.new("ScrollingFrame")
+FFSContainer.Name = "FFSContainer"
+FFSContainer.Size = UDim2.new(1, 0, 0, 260) -- حجم كبير يكفي للأكواد الطويلة
+FFSContainer.LayoutOrder = 2
+FFSContainer.BackgroundColor3 = Color3.fromRGB(8, 8, 12)
+FFSContainer.BorderSizePixel = 0
+FFSContainer.ScrollBarThickness = 6
+FFSContainer.ScrollBarImageColor3 = NeonBlue
+FFSContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
+FFSContainer.AutomaticCanvasSize = Enum.AutomaticSize.Y
+FFSContainer.Parent = ContentFFS
+local FFSContCorner = Instance.new("UICorner")
+FFSContCorner.CornerRadius = UDim.new(0, 8)
+FFSContCorner.Parent = FFSContainer
+local FFSContStroke = Instance.new("UIStroke")
+FFSContStroke.Color = Color3.fromRGB(40, 40, 60)
+FFSContStroke.Thickness = 1
+FFSContStroke.Parent = FFSContainer
+
 local FFSBox = Instance.new("TextBox")
 FFSBox.Name = "FFSBox"
-FFSBox.Size = UDim2.new(1, 0, 0, 180)
-FFSBox.LayoutOrder = 2
-FFSBox.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
-FFSBox.BorderSizePixel = 0
-FFSBox.TextColor3 = Color3.fromRGB(200, 200, 200)
-FFSBox.TextSize = 13
+FFSBox.Size = UDim2.new(1, -15, 1, -15)
+FFSBox.Position = UDim2.fromOffset(7, 7)
+FFSBox.BackgroundTransparency = 1
+FFSBox.TextColor3 = Color3.fromRGB(200, 220, 255)
+FFSBox.TextSize = 14
 FFSBox.Font = Enum.Font.Code
 FFSBox.TextXAlignment = Enum.TextXAlignment.Left
 FFSBox.TextYAlignment = Enum.TextYAlignment.Top
 FFSBox.ClearTextOnFocus = false
 FFSBox.MultiLine = true
-FFSBox.PlaceholderText = '{\n  "FLogNetwork": "7",\n  ...\n}'
-FFSBox.PlaceholderColor3 = Color3.fromRGB(80, 80, 90)
-FFSBox.Parent = ContentFFS
-local FFSBoxCorner = Instance.new("UICorner")
-FFSBoxCorner.CornerRadius = UDim.new(0, 8)
-FFSBoxCorner.Parent = FFSBox
-local FFSBoxStroke = Instance.new("UIStroke")
-FFSBoxStroke.Color = Color3.fromRGB(40, 40, 50)
-FFSBoxStroke.Thickness = 1
-FFSBoxStroke.Parent = FFSBox
+FFSBox.TextWrapped = true -- ضروري جداً لمنع الاقتطاع
+FFSBox.PlaceholderText = '{\n  "FLogNetwork": "7",\n  "DFIntTaskSchedulerTargetFps": "9999"\n}'
+FFSBox.PlaceholderColor3 = Color3.fromRGB(80, 80, 100)
+FFSBox.Parent = FFSContainer
 
-local BtnApplyFFS = CreateActionButton("BtnApplyFFS", "تطبيق الأكواد (Execute)", ContentFFS, 3)
+local BtnApplyFFS = CreateActionButton("BtnApplyFFS", "✅ تطبيق الأكواد (Execute)", ContentFFS, 3)
 
 -- زر Remove Log (تحت على الشمال)
 local BtnRemoveLog = Instance.new("TextButton")
 BtnRemoveLog.Name = "BtnRemoveLog"
-BtnRemoveLog.Size = UDim2.fromOffset(110, 35)
-BtnRemoveLog.Position = UDim2.fromOffset(0, 340) -- أسفل اليسار
-BtnRemoveLog.BackgroundColor3 = Color3.fromRGB(35, 15, 15)
+BtnRemoveLog.Size = UDim2.fromOffset(130, 38)
+BtnRemoveLog.Position = UDim2.fromOffset(0, 395) -- أسفل اليسار بالضبط
+BtnRemoveLog.BackgroundColor3 = Color3.fromRGB(40, 10, 10)
 BtnRemoveLog.BorderSizePixel = 0
 BtnRemoveLog.Text = "🗑 remove log"
 BtnRemoveLog.TextColor3 = Color3.fromRGB(255, 100, 100)
@@ -398,12 +470,18 @@ BtnRemoveLog.Parent = ContentFFS
 local RLCorner = Instance.new("UICorner")
 RLCorner.CornerRadius = UDim.new(0, 6)
 RLCorner.Parent = BtnRemoveLog
+local RLStroke = Instance.new("UIStroke")
+RLStroke.Color = Color3.fromRGB(100, 30, 30)
+RLStroke.Thickness = 1
+RLStroke.Parent = BtnRemoveLog
 
 BtnRemoveLog.MouseEnter:Connect(function()
-    TweenService:Create(BtnRemoveLog, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(50, 20, 20)}):Play()
+    TweenService:Create(BtnRemoveLog, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(60, 15, 15)}):Play()
+    TweenService:Create(RLStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(255, 100, 100)}):Play()
 end)
 BtnRemoveLog.MouseLeave:Connect(function()
-    TweenService:Create(BtnRemoveLog, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(35, 15, 15)}):Play()
+    TweenService:Create(BtnRemoveLog, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(40, 10, 10)}):Play()
+    TweenService:Create(RLStroke, TweenInfo.new(0.2), {Color = Color3.fromRGB(100, 30, 30)}):Play()
 end)
 
 -- منطق تطبيق الأكواد
@@ -418,44 +496,44 @@ BtnApplyFFS.MouseButton1Click:Connect(function()
     if success then
         local count = 0
         for flag, value in pairs(parsed) do
-            -- محاولة تطبيق العلم باستخدام setfflag (تعمل على معظم برامج التنفيذ)
             pcall(function()
                 setfflag(flag, tostring(value))
                 count += 1
             end)
         end
-        FFSBox.Text = "✅ تم تطبيق " .. count .. " بنجاح!"
-        task.delay(2, function() FFSBox.Text = jsonText end)
+        local originalText = FFSBox.Text
+        FFSBox.Text = "✅ تم تطبيق " .. count .. " فلاج بنجاح!"
+        task.delay(2.5, function() if FFSBox.Text == "✅ تم تطبيق " .. count .. " فلاج بنجاح!" then FFSBox.Text = originalText end end)
     else
-        FFSBox.Text = "❌ خطأ: تأكد من أن النص بصيغة JSON صحيحة."
-        task.delay(2, function() FFSBox.Text = "" end)
+        local originalText = FFSBox.Text
+        FFSBox.Text = "❌ خطأ: تأكد من أن النص بصيغة JSON صحيحة (أقواس، فواصل)."
+        task.delay(3, function() if FFSBox.Text:find("❌") then FFSBox.Text = originalText end end)
     end
 end)
 
 -- منطق Remove Log
 BtnRemoveLog.MouseButton1Click:Connect(function()
-    -- محاولة مسح السجلات بطرق مختلفة حسب برنامج التنفيذ
     pcall(function() cleardrawcache() end)
     pcall(function() clearconsole() end)
     
-    -- مسح محتوى الصندوق كنوع من التمويه البصري
     FFSBox.Text = ""
-    FFSBox.PlaceholderText = "تم مسح السجلات بنجاح ✓"
+    local originalPlaceholder = FFSBox.PlaceholderText
+    FFSBox.PlaceholderText = "✅ تم مسح السجلات والآثار بنجاح"
     
     task.delay(3, function()
-        FFSBox.PlaceholderText = '{\n  "FLogNetwork": "7",\n  ...\n}'
+        FFSBox.PlaceholderText = originalPlaceholder
     end)
 end)
 
 -- ==========================================
--- نظام السحب (Drag System)
+-- نظام السحب (Drag System) المحسّن
 -- ==========================================
 local Dragging = false
+local DragInput = nil
 local DragStart = nil
 local StartPosition = nil
 
 local function UpdateDrag(Input)
-    if not DragStart or not StartPosition then return end
     local Delta = Input.Position - DragStart
     Frame.Position = UDim2.new(
         StartPosition.X.Scale,
@@ -471,32 +549,43 @@ TopBar.InputBegan:Connect(function(Input)
         Dragging = true
         DragStart = Input.Position
         StartPosition = Frame.Position
+        
+        Input.Changed:Connect(function()
+            if Input.UserInputState == Enum.UserInputState.End then
+                Dragging = false
+            end
+        end)
     end
 end)
 
 TopBar.InputChanged:Connect(function(Input)
-    if Dragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
+    if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
+        DragInput = Input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(Input)
+    if Input == DragInput and Dragging then
         UpdateDrag(Input)
     end
 end)
 
-UserInputService.InputEnded:Connect(function(Input)
-    if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
-        Dragging = false
-    end
-end)
-
 -- ==========================================
--- حركات الدخول والخروج
+-- حركات الدخول والخروج (Animations)
 -- ==========================================
 CloseButton.MouseButton1Click:Connect(function()
     Dragging = false
-    local CloseTween = TweenService:Create(Frame, TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {Position = UDim2.new(0.5, 0, 1.5, 0)})
+    local CloseTween = TweenService:Create(Frame, TweenInfo.new(0.4, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
+        Position = UDim2.new(0.5, 0, 1.5, 0),
+        Transparency = 0
+    })
     CloseTween:Play()
     CloseTween.Completed:Connect(function()
         if Gui and Gui.Parent then Gui:Destroy() end
     end)
 end)
 
--- حركة الفتح
-TweenService:Create(Frame, TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, 0, 0.5, 0)}):Play()
+-- حركة الفتح الانسيابية
+TweenService:Create(Frame, TweenInfo.new(0.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
+    Position = UDim2.new(0.5, 0, 0.5, 0)
+}):Play()
